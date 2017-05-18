@@ -1,7 +1,16 @@
+/* If bootloader is not used, set default values */
+#if !defined(MBED_APP_START)
+  #define MBED_APP_START 0x08000000
+#endif
+
+#if !defined(MBED_APP_SIZE)
+  #define MBED_APP_SIZE 256k
+#endif
+
 /* Linker script to configure memory regions. */
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 256K
+  FLASH (rx) : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
   SRAM2 (rwx)  : ORIGIN = 0x10000188, LENGTH = 16k - 0x188
   SRAM1 (rwx)  : ORIGIN = 0x20000000, LENGTH = 48k
 }
