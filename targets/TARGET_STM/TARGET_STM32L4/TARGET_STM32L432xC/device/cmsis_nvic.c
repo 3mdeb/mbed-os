@@ -27,11 +27,22 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************
- */ 
+ */
 #include "cmsis_nvic.h"
 
 #define NVIC_RAM_VECTOR_ADDRESS   (0x10000000)  // Vectors positioned at start of SRAM2
-#define NVIC_FLASH_VECTOR_ADDRESS (0x08000000)  // Initial vector position in flash
+#if defined(__ICCARM__)
+    #pragma section=".intvec"
+    #define NVIC_FLASH_VECTOR_ADDRESS   ((uint32_t)__section_begin(".intvec"))
+#elif defined(__CC_ARM)
+    extern uint32_t Load$$LR$$LR_IROM1$$Base[];
+    #define NVIC_FLASH_VECTOR_ADDRESS   ((uint32_t)Load$$LR$$LR_IROM1$$Base)
+#elif defined(__GNUC__)
+    extern uint32_t flash[];
+    #define NVIC_FLASH_VECTOR_ADDRESS   ((uint32_t)flash)
+#else
+    #error "Flash vector address not set for this toolchain"
+#endif
 
 void NVIC_SetVector(IRQn_Type IRQn, uint32_t vector) {
     uint32_t *vectors = (uint32_t *)SCB->VTOR;
